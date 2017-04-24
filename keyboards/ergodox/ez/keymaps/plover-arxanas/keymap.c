@@ -1,17 +1,13 @@
-#include "ergodox_ez.h"
+#include "ergodox.h"
 #include "debug.h"
 #include "action_layer.h"
+#include "sendchar.h"
+#include "virtser.h"
 
 #define BASE 0 // default layer
 #define SYMB 1 // symbols
 #define MDIA 2 // media keys
 #define PLVR 3 // Plover layer
-
-#define MACRO_PLOVER_ON  0
-#define MACRO_PLOVER_OFF 1
-
-#define M_PLON M(MACRO_PLOVER_ON)
-#define M_PLOF M(MACRO_PLOVER_OFF)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Keymap 0: Basic layer (Dvorak)
@@ -47,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                      KC_BSPC,  LALT(KC_BSPC),  KC_END,
         // right hand
              KC_RGHT,  KC_6,  KC_7,     KC_8,   KC_9,   KC_0,   KC_BSLS,
-             M_PLON,   KC_F,  KC_G,     KC_C,   KC_R,   KC_L,   KC_EQL,
+             TG(PLVR), KC_F,  KC_G,     KC_C,   KC_R,   KC_L,   KC_EQL,
                        KC_D,  KC_H,     KC_T,   KC_N,   KC_S,   LT(MDIA, KC_MINS),
              KC_LALT,  KC_B,  KC_M,     KC_W,   KC_V,   KC_Z,   KC_RSFT,
                               KC_RBRC,  KC_NO,  KC_NO,  KC_NO,  KC_SLSH,
@@ -139,16 +135,46 @@ KEYMAP(
        KC_TRNS, KC_WBAK, KC_WFWD
 ),
 
+// TX Bolt codes -- see https://github.com/qmk/qmk_firmware/blob/master/keyboards/ergodox/ez/keymaps/steno/keymap.c
+#define Sl 0b00000001
+#define Tl 0b00000010
+#define Kl 0b00000100
+#define Pl 0b00001000
+#define Wl 0b00010000
+#define Hl 0b00100000
+#define Rl 0b01000001
+#define Al 0b01000010
+#define Ol 0b01000100
+#define X  0b01001000
+#define Er 0b01010000
+#define Ur 0b01100000
+#define Fr 0b10000001
+#define Rr 0b10000010
+#define Pr 0b10000100
+#define Br 0b10001000
+#define Lr 0b10010000
+#define Gr 0b10100000
+#define Tr 0b11000001
+#define Sr 0b11000010
+#define Dr 0b11000100
+#define Zr 0b11001000
+#define NM 0b11010000
+#define GRPMASK 0b11000000
+#define GRP0 0b00000000
+#define GRP1 0b01000000
+#define GRP2 0b10000000
+#define GRP3 0b11000000
+
 /* Keymap 3: Steno for Plover from https://github.com/shayneholmes/tmk_keyboard/commit/11290f8489013018f778627db725160c745e75bd
  *
  * ,--------------------------------------------------.           ,--------------------------------------------------.
  * |        |      |      |      |      |      |      |           |      |      |      |      |      |      |        |
  * |--------+------+------+------+------+-------------|           |------+------+------+------+------+------+--------|
- * |        |   1  |   2  |   3  |   4  |   5  |      |           |Plover|  6   |  7   |   8  |   9  |  0   |        |
+ * |        |   #  |   #  |   #  |   #  |   #  |      |           |Plover|  #   |  #   |   #  |   #  |  #   |        |
  * |--------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
- * |        |   q  |   w  |   e  |   r  |   t  |------|           |------|  y   |  u   |   i  |   o  |  p   |   [    |
+ * |        |   S  |   T  |   P  |   H  |   *  |------|           |------|  *   |  F   |   P  |   L  |  T   |   D    |
  * |--------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
- * |        |   a  |   s  |   d  |   f  |   g  |      |           |      |  h   |  j   |   k  |   l  |  ;   |   '    |
+ * |        |   S  |   K  |   W  |   R  |   *  |      |           |      |  *   |  R   |   B  |   N  |  S   |   Z    |
  * `--------+------+------+------+------+-------------'           `-------------+------+------+------+------+--------'
  *   |      |      |      |      |      |                                       |      |      |      |      |      |
  *   `----------------------------------'                                       `----------------------------------'
@@ -156,7 +182,7 @@ KEYMAP(
  *                                        |      |      |       |      |      |
  *                                 ,------|------|------|       |------+------+------.
  *                                 |      |      |      |       |      |      |      |
- *                                 |   c  |   v  |------|       |------|  n   |  m   |
+ *                                 |   A  |   O  |------|       |------|  E   |  U   |
  *                                 |      |      |      |       |      |      |      |
  *                                 `--------------------'       `--------------------'
  */
@@ -164,22 +190,22 @@ KEYMAP(
 [PLVR] = KEYMAP(  // layout: layer 3: Steno for Plover
         // left hand
         KC_TRNS,  KC_NO,  KC_NO,  KC_NO,  KC_NO,  KC_NO,  KC_TRNS,
-        KC_TRNS,  KC_1,   KC_2,   KC_3,   KC_4,   KC_5,   KC_TRNS,
-        KC_TRNS,  KC_Q,   KC_W,   KC_E,   KC_R,   KC_T,
-        KC_TRNS,  KC_A,   KC_S,   KC_D,   KC_F,   KC_G,   KC_TRNS,
+        KC_TRNS,  M(NM),  M(NM),  M(NM),  M(NM),  M(NM),  KC_TRNS,
+        KC_TRNS,  M(Sl),  M(Tl),  M(Pl),  M(Hl),  M(X),
+        KC_TRNS,  M(Sl),  M(Kl),  M(Wl),  M(Rl),  M(X),   KC_TRNS,
         KC_TRNS,  KC_NO,  KC_NO,  KC_NO,  KC_NO,
                                           KC_TRNS,  KC_TRNS,
                                                     KC_TRNS,
-                                      KC_C,  KC_V,  KC_TRNS,
+                                      M(Al), M(Ol), KC_TRNS,
         // right hand
              KC_TRNS,  KC_NO,  KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_TRNS,
-             M_PLOF,   KC_6,   KC_7,     KC_8,     KC_9,     KC_0,     KC_TRNS,
-                       KC_Y,   KC_U,     KC_I,     KC_O,     KC_P,     KC_LBRC,
-             KC_TRNS,  KC_H,   KC_J,     KC_K,     KC_L,     KC_SCLN,  KC_QUOT,
+             KC_TRNS,  M(NM),  M(NM),    M(NM),    M(NM),    M(NM),    KC_TRNS,
+                       M(X),   M(Fr),    M(Pr),    M(Lr),    M(Tr),    M(Dr),
+             KC_TRNS,  M(X),   M(Rr),    M(Br),    M(Gr),    M(Sr),    M(Zr),
                                KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,
         KC_TRNS, KC_TRNS,
         KC_TRNS,
-        KC_TRNS, KC_N,  KC_M
+        KC_TRNS, M(Er), M(Ur)
 ),
 };
 
@@ -188,33 +214,41 @@ const uint16_t PROGMEM fn_actions[] = {
     [22] = ACTION_LAYER_TAP_TOGGLE(MDIA), // FN22 - Momentary layer 2 (Media)
 };
 
+uint8_t chord[4] = {0, 0, 0, 0};
+uint8_t pressed_count = 0;
+
+void send_chord(void)
+{
+    for (uint8_t i = 0; i < 4; i++) {
+        if (chord[i]) {
+            virtser_send(chord[i]);
+        }
+    }
+    virtser_send(0);
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t* record)
+{
+    // We need to track keypresses in all modes, in case the user
+    // changes mode whilst pressing other keys.
+    if (record->event.pressed) {
+        pressed_count++;
+    } else {
+        pressed_count--;
+    }
+    return true;
+}
+
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
-    switch (id) {
-    case MACRO_PLOVER_ON:
-        if (record->event.pressed) {
-            layer_on(PLVR);
-            // Send the PHROPB stroke to enable Plover.
-            // (Note that you must have this command in your dictionary for it
-            // to actually do anything.)
-            return MACRO(D(E), D(R), D(F), D(V), D(I), D(K),
-                         WAIT(50),
-                         U(E), U(R), U(F), U(V), U(I), U(K),
-                         END);
+    if (record->event.pressed) {
+        uint8_t grp = (id & GRPMASK) >> 6;
+        chord[grp] |= id;
+    } else {
+        if (pressed_count == 0) {
+            send_chord();
+            chord[0] = chord[1] = chord[2] = chord[3] = 0;
         }
-        break;
-
-    case MACRO_PLOVER_OFF:
-        if (record->event.pressed) {
-            layer_off(PLVR);
-            // Send the PHROF stroke to disable Plover.
-            return MACRO(D(E), D(R), D(F), D(V), D(U),
-                         WAIT(50),
-                         U(E), U(R), U(F), U(V), U(U),
-                         END);
-        }
-
-        break;
     }
     return MACRO_NONE;
 };
