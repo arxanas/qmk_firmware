@@ -1,4 +1,4 @@
-#include "ergodox.h"
+#include "ergodox_ez.h"
 #include "debug.h"
 #include "action_layer.h"
 #include "sendchar.h"
@@ -30,7 +30,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                                 |      | Bksp |  End |       | PgDn |        |      |
  *                                 `--------------------'       `----------------------'
  */
-[BASE] = KEYMAP(
+[BASE] = LAYOUT_ergodox(
         // left hand
         KC_NO,          KC_1,     KC_2,     KC_3,    KC_4,     KC_5,  KC_NO,
         KC_TAB,         KC_QUOT,  KC_COMM,  KC_DOT,  KC_P,     KC_Y,  KC_NO,
@@ -72,7 +72,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                                 `--------------------'       `--------------------'
  */
 // MEDIA AND MOUSE
-KEYMAP(
+LAYOUT_ergodox(
        RESET,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_TRNS,
        KC_TRNS, KC_TRNS, KC_TRNS, KC_UP,   KC_TRNS, KC_TRNS, KC_TRNS,
        KC_TRNS, KC_TRNS, KC_LEFT, KC_DOWN, KC_RGHT, KC_TRNS,
@@ -144,7 +144,7 @@ KEYMAP(
  *                                 `--------------------'       `--------------------'
  */
 
-[PLVR] = KEYMAP(  // layout: layer 2: Steno for Plover
+[PLVR] = LAYOUT_ergodox(  // layout: layer 2: Steno for Plover
         // left hand
         KC_TRNS,  KC_NO,  KC_NO,  KC_NO,  KC_NO,  KC_NO,  KC_TRNS,
         KC_TRNS,  M(NM),  M(NM),  M(NM),  M(NM),  M(NM),  KC_TRNS,

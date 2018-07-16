@@ -249,10 +249,12 @@ typedef struct
 #   define CDC_OUT_EPNUM  MIDI_STREAM_OUT_EPNUM
 #endif
 
+/*
 #if (defined(PROTOCOL_LUFA) && CDC_OUT_EPNUM > (ENDPOINT_TOTAL_ENDPOINTS - 1)) || \
   (defined(PROTOCOL_CHIBIOS) && CDC_OUT_EPNUM > USB_MAX_ENDPOINTS)
 # error "There are not enough available endpoints to support all functions. Remove some in the rules.mk file.(MOUSEKEY, EXTRAKEY, CONSOLE, NKRO, MIDI, SERIAL, STENO)"
 #endif
+*/
 
 #define KEYBOARD_EPSIZE             8
 #define MOUSE_EPSIZE                8
