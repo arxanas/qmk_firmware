@@ -3,4 +3,5 @@
 CONSOLE_ENABLE = no
 COMMAND_ENABLE = no
 STENO_ENABLE = yes
+WPM_ENABLE = yes
 SRC = matrix.c

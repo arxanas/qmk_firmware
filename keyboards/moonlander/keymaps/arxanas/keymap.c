@@ -1,36 +1,16 @@
 #include QMK_KEYBOARD_H
 #include "version.h"
 #include "keymap_steno.h"
-
-#define KC_MAC_UNDO LGUI(KC_Z)
-#define KC_MAC_CUT LGUI(KC_X)
-#define KC_MAC_COPY LGUI(KC_C)
-#define KC_MAC_PASTE LGUI(KC_V)
-#define KC_PC_UNDO LCTL(KC_Z)
-#define KC_PC_CUT LCTL(KC_X)
-#define KC_PC_COPY LCTL(KC_C)
-#define KC_PC_PASTE LCTL(KC_V)
-#define ES_LESS_MAC KC_GRAVE
-#define ES_GRTR_MAC LSFT(KC_GRAVE)
-#define ES_BSLS_MAC ALGR(KC_6)
-#define NO_PIPE_ALT KC_GRAVE
-#define NO_BSLS_ALT KC_EQUAL
-#define LSA_T(kc) MT(MOD_LSFT | MOD_LALT, kc)
-#define BP_NDSH_MAC ALGR(KC_8)
-#define MOON_LED_LEVEL LED_LEVEL
-
-enum custom_keycodes {
-    RGB_SLD = ML_SAFE_RANGE,
-};
+#include "wpm.h"
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_moonlander(
     KC_DELETE,      KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           KC_6,                                           KC_5,           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_BSLASH,
     KC_TAB,         KC_QUOTE,       KC_COMMA,       KC_DOT,         KC_P,           KC_Y,           TG(1),                                          TG(2),          KC_F,           KC_G,           KC_C,           KC_R,           KC_L,           KC_EQUAL,
-    LCTL_T(KC_ESCAPE),KC_A,           KC_O,           KC_E,           KC_U,           KC_I,           KC_LBRACKET,                                                                    KC_RBRACKET,    KC_D,           KC_H,           KC_T,           KC_N,           KC_S,           LT(1,KC_MINUS),
+    LCTL_T(KC_ESCAPE),KC_A,           KC_O,           KC_E,           KC_U,           KC_I,           KC_LSPO,                                                                        KC_RSPC,        KC_D,           KC_H,           KC_T,           KC_N,           KC_S,           LT(1,KC_MINUS),
     KC_LSHIFT,      KC_SCOLON,      KC_Q,           KC_J,           KC_K,           KC_X,                                           KC_B,           KC_M,           KC_W,           KC_V,           KC_Z,           KC_RSHIFT,
-    KC_GRAVE,       WEBUSB_PAIR,    KC_TRANSPARENT, KC_HOME,        KC_END,         KC_LGUI,                                                                                                        KC_LALT,        KC_PGUP,        KC_PGDOWN,      KC_TRANSPARENT, KC_SLASH,       KC_SLASH,
+    KC_GRAVE,       WEBUSB_PAIR,    KC_HOME,        KC_END,         KC_LBRACKET,    KC_LGUI,                                                                                                        KC_LALT,        KC_RBRACKET,    KC_PGUP,        KC_PGDOWN,      KC_SLASH,       KC_SLASH,
     KC_BSPACE,      LALT(KC_BSPACE),KC_LGUI,                        KC_LALT,        KC_ENTER,       KC_SPACE
   ),
   [1] = LAYOUT_moonlander(
@@ -74,6 +54,11 @@ void set_layer_color(int layer) {
         if (!hsv.h && !hsv.s && !hsv.v) {
             rgb_matrix_set_color(i, 0, 0, 0);
         } else {
+            // Steno layer.
+            if (layer == 2) {
+                int wpm = get_current_wpm();
+                hsv.v   = wpm > 200 ? UINT8_MAX : UINT8_MAX * ((float)wpm / 200);
+            }
             RGB   rgb = hsv_to_rgb(hsv);
             float f   = (float)rgb_matrix_config.hsv.v / UINT8_MAX;
             rgb_matrix_set_color(i, f * rgb.r, f * rgb.g, f * rgb.b);
@@ -89,19 +74,28 @@ void rgb_matrix_indicators_user(void) {
         case 1:
             set_layer_color(1);
             break;
+        case 2:
+            set_layer_color(2);
+            break;
         default:
             if (rgb_matrix_get_flags() == LED_FLAG_NONE) rgb_matrix_set_color_all(0, 0, 0);
             break;
     }
 }
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case RGB_SLD:
-            if (record->event.pressed) {
-                rgblight_mode(1);
-            }
-            return false;
+static uint8_t     current_wpm   = 0;
+static uint8_t     latest_wpm    = 0;
+static uint16_t    wpm_timer     = 0;
+static const float wpm_smoothing = 0.0487;
+
+bool process_steno_user(uint16_t _keycode, keyrecord_t* record) {
+    if (record->event.pressed) {
+        if (wpm_timer > 0) {
+            latest_wpm  = 60000 / timer_elapsed(wpm_timer) * 1.0;
+            current_wpm = (latest_wpm - current_wpm) * wpm_smoothing + current_wpm;
+            set_current_wpm(current_wpm);
+        }
+        wpm_timer = timer_read();
     }
     return true;
 }
