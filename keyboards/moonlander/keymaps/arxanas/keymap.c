@@ -1,5 +1,6 @@
 #include QMK_KEYBOARD_H
 #include "version.h"
+#include "keymap_steno.h"
 
 #define KC_MAC_UNDO LGUI(KC_Z)
 #define KC_MAC_CUT LGUI(KC_X)
@@ -26,7 +27,7 @@ enum custom_keycodes {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_moonlander(
     KC_DELETE,      KC_1,           KC_2,           KC_3,           KC_4,           KC_5,           KC_6,                                           KC_5,           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_BSLASH,
-    KC_TAB,         KC_QUOTE,       KC_COMMA,       KC_DOT,         KC_P,           KC_Y,           TG(1),                                          TG(1),          KC_F,           KC_G,           KC_C,           KC_R,           KC_L,           KC_EQUAL,
+    KC_TAB,         KC_QUOTE,       KC_COMMA,       KC_DOT,         KC_P,           KC_Y,           TG(1),                                          TG(2),          KC_F,           KC_G,           KC_C,           KC_R,           KC_L,           KC_EQUAL,
     LCTL_T(KC_ESCAPE),KC_A,           KC_O,           KC_E,           KC_U,           KC_I,           KC_LBRACKET,                                                                    KC_RBRACKET,    KC_D,           KC_H,           KC_T,           KC_N,           KC_S,           LT(1,KC_MINUS),
     KC_LSHIFT,      KC_SCOLON,      KC_Q,           KC_J,           KC_K,           KC_X,                                           KC_B,           KC_M,           KC_W,           KC_V,           KC_Z,           KC_RSHIFT,
     KC_GRAVE,       WEBUSB_PAIR,    KC_TRANSPARENT, KC_HOME,        KC_END,         KC_LGUI,                                                                                                        KC_LALT,        KC_PGUP,        KC_PGDOWN,      KC_TRANSPARENT, KC_SLASH,       KC_SLASH,
@@ -40,6 +41,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_MS_BTN1,     KC_MS_BTN2,     KC_TRANSPARENT,                                                                                                 KC_TRANSPARENT, KC_AUDIO_VOL_DOWN,KC_AUDIO_VOL_UP,KC_AUDIO_MUTE,  KC_TRANSPARENT, KC_TRANSPARENT,
     KC_MS_BTN1,     KC_MS_BTN2,     KC_TRANSPARENT,                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT
   ),
+  [2] = LAYOUT_moonlander(
+    KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,                                          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,
+    KC_NO,          STN_NUM,        STN_NUM,        STN_NUM,        STN_NUM,        STN_NUM,        KC_NO,                                          KC_TRANSPARENT, STN_NUM,        STN_NUM,        STN_NUM,        STN_NUM,        STN_NUM,        STN_NUM,
+    KC_NO,          STN_SL,         STN_TL,         STN_PL,         STN_HL,         STN_STR,        KC_NO,                                                                          KC_NO,          STN_STR,        STN_FR,         STN_PR,         STN_LR,         STN_TR,         STN_DR,
+    KC_NO,          STN_SL,         STN_KL,         STN_WL,         STN_RL,         STN_STR,                                                                                                        STN_STR,        STN_RR,         STN_BR,         STN_GR,         STN_SR,         STN_ZR,
+    KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,                                                                                                          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,          KC_NO,
+    STN_A,          STN_O,          KC_NO,                          KC_NO,          STN_E,          STN_U
+  ),
 };
 // clang-format on
 
@@ -51,7 +60,8 @@ void keyboard_post_init_user(void) { rgb_matrix_enable(); }
 const uint8_t PROGMEM ledmap[][DRIVER_LED_TOTAL][3] = {
     [1] = {{69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230},
            {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}, {69, 145, 230}},
-
+    [2] = {{135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255},
+           {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}, {135, 255, 255}},
 };
 
 void set_layer_color(int layer) {
